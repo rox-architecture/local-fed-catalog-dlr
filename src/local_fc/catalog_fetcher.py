@@ -19,7 +19,7 @@ EDC_CONTEXT = {
 }
 
 SERVICES_KEY = f"{DID_NAMESPACE}#service"
-SERVICE_ENDPOINT_KEY = f"{DID_NAMESPACE}#service"
+SERVICE_ENDPOINT_KEY = f"{DID_NAMESPACE}#serviceEndpoint"
 
 
 def _get_service_identifier(service: dict[str, Any]) -> str | None:
@@ -87,6 +87,10 @@ class CatalogFetcher:
         did_document = await self._did_resolver.resolve(did)
         expanded = self._jsonld_parser.expand(did_document)
         dsp_url = self._get_dsp_service_endpoint(expanded[0])
+
+        if dsp_url is None:
+            error_message = "Failed to fetch DSP URL"
+            raise ValueError(error_message)
 
         url = f"{self._base_url}v3/catalog/request"
         payload = {

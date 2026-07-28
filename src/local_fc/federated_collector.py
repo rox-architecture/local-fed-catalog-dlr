@@ -1,8 +1,11 @@
 import asyncio
 import contextlib
+import logging
 from typing import Any
 
 from local_fc.catalog_fetcher import CatalogFetcher
+
+logger = logging.getLogger(__name__)
 
 
 class FederatedCollector:
@@ -37,6 +40,7 @@ class FederatedCollector:
             try:
                 catalog = await self._catalog_fetcher.fetch(bpn, did)
             except Exception:
+                logger.exception("Failed to fetch catalog for %s", bpn)
                 if attempt > self._retries:
                     return
                 await asyncio.sleep(self._delay)
@@ -47,8 +51,12 @@ class FederatedCollector:
 
     async def _fetch_single_round(self) -> None:
         """Fetch each catalog once."""
+        logger.info("Fetching catalogs")
+
         # TODO: Implement proper retrieval
-        bpn_did_dict = {"BPNL000000000001": "did:web:www.example.com"}
+        bpn_did_dict = {
+            "BPNLD6VP3E63ZBUT": "did:web:vision-x-api.base-x-ecosystem.org:connectors:alice-http"
+        }
 
         semaphore = asyncio.Semaphore(self._concurrency)
 
