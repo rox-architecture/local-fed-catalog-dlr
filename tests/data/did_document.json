@@ -1,0 +1,32 @@
+{
+    "service": [
+        {
+            "id": "dsp-url",
+            "type": "ProtocolEndpoint",
+            "serviceEndpoint": "https://www.example.com/cp/protocol"
+        },
+        {
+            "id": "credentialservice-1",
+            "type": "CredentialService",
+            "serviceEndpoint": "https://www.example.com/ih/presentation/v1/participants/Y29ubmVjdG9y"
+        }
+    ],
+    "verificationMethod": [
+        {
+            "id": "did:web:www.example.com#signing-key-1",
+            "type": "JsonWebKey2020",
+            "controller": "did:web:www.example.com",
+            "publicKeyMultibase": null,
+            "publicKeyJwk": {
+                "kty": "OKP",
+                "crv": "Ed25519",
+                "x": "l-0o-vb5AFfX62jK71RBH5HyJOnL5d32NVxnRz_yXWE"
+            }
+        }
+    ],
+    "authentication": [],
+    "id": "did:web:www.example.com",
+    "@context": [
+        "https://www.w3.org/ns/did/v1"
+    ]
+}
