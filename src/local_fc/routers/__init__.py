@@ -1,5 +1,7 @@
 from local_fc.routers.catalogs import catalogs_router
+from local_fc.routers.health import health_router
+from local_fc.routers.trigger import trigger_router
 
-routers = [catalogs_router]
+routers = [catalogs_router, health_router, trigger_router]
 
-__all__ = ["catalogs_router"]
+__all__ = ["routers"]

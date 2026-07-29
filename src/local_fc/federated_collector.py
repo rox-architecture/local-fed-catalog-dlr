@@ -31,6 +31,9 @@ class FederatedCollector:
         self._task: asyncio.Task[None] | None = None
         self._stop_event = asyncio.Event()
 
+        self._fetch_lock = asyncio.Lock()
+        self._trigger_event = asyncio.Event()
+
     async def _fetch_with_retry(self, bpn: str, did: str) -> None:
         """Fetch the given catalog with retry."""
         attempt = 0
@@ -51,27 +54,34 @@ class FederatedCollector:
 
     async def _fetch_single_round(self) -> None:
         """Fetch each catalog once."""
-        logger.info("Fetching catalogs")
+        async with self._fetch_lock:
+            logger.info("Fetching catalogs")
 
-        # TODO: Implement proper retrieval
-        bpn_did_dict = {
-            "BPNLD6VP3E63ZBUT": "did:web:vision-x-api.base-x-ecosystem.org:connectors:alice-http"
-        }
+            # TODO: Implement proper retrieval
+            bpn_did_dict = {
+                "BPNLD6VP3E63ZBUT": "did:web:vision-x-api.base-x-ecosystem.org:connectors:alice-http"
+            }
 
-        semaphore = asyncio.Semaphore(self._concurrency)
+            semaphore = asyncio.Semaphore(self._concurrency)
 
-        async def _bounded_fetch(bpn: str, did: str) -> None:
-            async with semaphore:
-                await self._fetch_with_retry(bpn, did)
+            async def _bounded_fetch(bpn: str, did: str) -> None:
+                async with semaphore:
+                    await self._fetch_with_retry(bpn, did)
 
-        await asyncio.gather(
-            *(_bounded_fetch(bpn, did) for bpn, did in bpn_did_dict.items())
-        )
+            await asyncio.gather(
+                *(_bounded_fetch(bpn, did) for bpn, did in bpn_did_dict.items())
+            )
 
     async def _run_loop(self) -> None:
         while self._task is not None:
             await self._fetch_single_round()
-            await asyncio.sleep(self._poll_interval)
+
+            with contextlib.suppress(TimeoutError):
+                await asyncio.wait_for(
+                    self._trigger_event.wait(), timeout=self._poll_interval
+                )
+
+            self._trigger_event.clear()
 
     async def start(self) -> None:
         """Start the collector."""
@@ -86,6 +96,11 @@ class FederatedCollector:
             with contextlib.suppress(asyncio.CancelledError):
                 await self._task
             self._task = None
+
+    async def trigger(self) -> None:
+        """Trigger an immediate catalog fetch."""
+        await self._fetch_single_round()
+        self._trigger_event.set()
 
     def get_catalogs(self) -> list[Any]:
         """Return the federated catalog."""
