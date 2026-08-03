@@ -1,6 +1,6 @@
 from typing import Any
 
-from httpx import AsyncClient
+import httpx
 from pydantic import HttpUrl
 
 from local_fc.did_resolver import DID_NAMESPACE, DidResolver
@@ -58,19 +58,17 @@ class CatalogFetcher:
         *,
         base_url: HttpUrl,
         api_key: str,
-        did_resolver: DidResolver,
-        jsonld_parser: JsonldParser,
         dsp_service_id: str,
         timeout: int,
     ) -> None:
         """Initialize the instance."""
-        self._did_resolver = did_resolver
-        self._jsonld_parser = jsonld_parser
+        self._did_resolver = DidResolver(timeout=timeout)
+        self._jsonld_parser = JsonldParser()
         self._dsp_service_id = dsp_service_id
 
         headers = {"Authorization": f"Bearer {api_key}"}
         self._base_url = base_url
-        self._client = AsyncClient(timeout=timeout, headers=headers)
+        self._client = httpx.AsyncClient(timeout=timeout, headers=headers)
 
     def _get_dsp_service_endpoint(self, did_document: dict[str, Any]) -> str | None:
         """Retrieve the DSP URL from the given expanded DID document."""
@@ -92,7 +90,8 @@ class CatalogFetcher:
             error_message = "Failed to fetch DSP URL"
             raise ValueError(error_message)
 
-        url = f"{self._base_url}v3/catalog/request"
+        url = str(self._base_url).rstrip("/")
+        url += "/v3/catalog/request"
         payload = {
             "@context": EDC_CONTEXT,
             "counterPartyAddress": dsp_url,
@@ -103,8 +102,9 @@ class CatalogFetcher:
 
         response = await self._client.post(url, json=payload)
         response.raise_for_status()
-        return response.json()
+        return response.json() | {"originator": dsp_url}
 
     async def shutdown(self) -> None:
         """Shut down the fetcher."""
         await self._client.aclose()
+        await self._did_resolver.shutdown()

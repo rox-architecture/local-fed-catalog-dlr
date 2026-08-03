@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from pydantic import Field, HttpUrl
 from pydantic.alias_generators import to_camel
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -28,13 +30,6 @@ class Settings(BaseSettings):
         title="Connector Management API",
         description="The management API endpoint of the connector.",
         examples=["https://www.example.com/management/"],
-    )
-
-    did_resolver_timeout_seconds: int = Field(
-        10,
-        title="DID Resolver Timeout Seconds",
-        description="Timeout of the DID Resolver HTTP client.",
-        examples=[10],
     )
 
     dsp_service_id: str = Field(
@@ -70,4 +65,10 @@ class Settings(BaseSettings):
         title="Federated Collector Retries Max",
         description="Maximal number of retries for the collection of a single catalog.",
         examples=[3],
+    )
+
+    partner_mapping_path: Path = Field(
+        title="Partner Mapping Path",
+        description="The path to the JSON file containing the partner mapping.",
+        examples=["/home/my-user/data/partners.json"],
     )

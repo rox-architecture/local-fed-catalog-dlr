@@ -4,6 +4,7 @@ import logging
 from typing import Any
 
 from local_fc.catalog_fetcher import CatalogFetcher
+from local_fc.partner_mapping import PartnerMapping
 
 logger = logging.getLogger(__name__)
 
@@ -15,6 +16,7 @@ class FederatedCollector:
         self,
         *,
         catalog_fetcher: CatalogFetcher,
+        partner_mapping: PartnerMapping,
         poll_interval: float,
         concurrency: int,
         retries: int,
@@ -22,6 +24,7 @@ class FederatedCollector:
     ) -> None:
         """Initialize the instance."""
         self._catalog_fetcher = catalog_fetcher
+        self._partner_mapping = partner_mapping
         self._poll_interval = poll_interval
         self._concurrency = concurrency
         self._retries = retries
@@ -57,12 +60,12 @@ class FederatedCollector:
         async with self._fetch_lock:
             logger.info("Fetching catalogs")
 
-            # TODO: Implement proper retrieval
-            bpn_did_dict = {
-                "BPNLD6VP3E63ZBUT": "did:web:vision-x-api.base-x-ecosystem.org:connectors:alice-http"
-            }
-
             semaphore = asyncio.Semaphore(self._concurrency)
+            bpn_did_dict = await self._partner_mapping.get_all()
+
+            stale_bpns = self._catalogs.keys() - bpn_did_dict.keys()
+            for bpn in stale_bpns:
+                self._catalogs.pop(bpn)
 
             async def _bounded_fetch(bpn: str, did: str) -> None:
                 async with semaphore:
