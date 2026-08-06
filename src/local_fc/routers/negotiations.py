@@ -35,4 +35,4 @@ async def initiate_negotiation(
     if not isinstance(datasets, list):
         policies = [policies]
 
-    return state.edc_client.initiate_negotiation(originator, policies[0])
+    return await state.edc_client.initiate_negotiation(originator, policies[0])
