@@ -50,8 +50,8 @@ def _get_service_endpoint(service: dict[str, Any]) -> str | None:
     return endpoint.get("@id")
 
 
-class CatalogFetcher:
-    """Fetcher for catalogs."""
+class EdcClient:
+    """Client for interacting with the EDC."""
 
     def __init__(
         self,
@@ -80,7 +80,7 @@ class CatalogFetcher:
 
         return None
 
-    async def fetch(self, bpn: str, did: str, limit: int = 1000) -> Any:
+    async def get_catalog(self, bpn: str, did: str, limit: int = 1000) -> Any:
         """Fetch the catalog of the given participant."""
         did_document = await self._did_resolver.resolve(did)
         expanded = self._jsonld_parser.expand(did_document)
@@ -103,6 +103,33 @@ class CatalogFetcher:
         response = await self._client.post(url, json=payload)
         response.raise_for_status()
         return response.json() | {"originator": dsp_url}
+
+    async def get_agreements(self, limit: int = 1000) -> Any:
+        """Fetch all agreements."""
+        url = str(self._base_url).rstrip("/")
+        url += "/v3/contractagreements/request"
+        payload = {"@context": EDC_CONTEXT, "offset": 0, "limit": limit}
+
+        response = await self._client.post(url, json=payload)
+        response.raise_for_status()
+        return response.json()
+
+    async def initiate_negotiation(
+        self, counter_party_address: str, policy: Any
+    ) -> Any:
+        """Initiate a negotiation for the given offer."""
+        url = str(self._base_url).rstrip("/")
+        url += "/v3/edrs"
+        payload = {
+            "@context": EDC_CONTEXT,
+            "counter_party_address": counter_party_address,
+            "protocol": "dataspace-protocol-http",
+            "policy": policy,
+        }
+
+        response = await self._client.post(url, json=payload)
+        response.raise_for_status()
+        return response.json()
 
     async def shutdown(self) -> None:
         """Shut down the fetcher."""

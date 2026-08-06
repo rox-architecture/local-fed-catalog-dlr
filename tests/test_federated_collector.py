@@ -7,11 +7,11 @@ from local_fc.federated_collector import FederatedCollector
 
 
 @pytest.fixture
-def catalog_fetcher() -> AsyncMock:
-    """Return a mock catalog fetcher."""
-    catalog_fetcher = AsyncMock()
-    catalog_fetcher.fetch.return_value = {"@context": {}}
-    return catalog_fetcher
+def edc_client() -> AsyncMock:
+    """Return a mock EDC client."""
+    edc_client = AsyncMock()
+    edc_client.get_catalog.return_value = {"@context": {}}
+    return edc_client
 
 
 @pytest.fixture
@@ -23,10 +23,10 @@ def partner_mapping() -> AsyncMock:
 
 
 @pytest.mark.asyncio
-async def test_fetch(catalog_fetcher: AsyncMock, partner_mapping: AsyncMock) -> None:
+async def test_fetch(edc_client: AsyncMock, partner_mapping: AsyncMock) -> None:
     """Test catalog fetching."""
     federated_collector = FederatedCollector(
-        catalog_fetcher=catalog_fetcher,
+        edc_client=edc_client,
         partner_mapping=partner_mapping,
         poll_interval=0.005,
         concurrency=10,

@@ -13,13 +13,6 @@ class Settings(BaseSettings):
         populate_by_name=True,
     )
 
-    catalog_fetcher_timeout_seconds: int = Field(
-        20,
-        title="Catalog Fetcher Timeout Seconds",
-        description="Timeout of the catalog fetcher HTTP client.",
-        examples=[20],
-    )
-
     connector_api_key: str = Field(
         title="Connector API Key",
         description="The API for the connector.",
@@ -37,6 +30,13 @@ class Settings(BaseSettings):
         title="DSP Service ID",
         description="ID of the DSP service in the DID document.",
         examples=["dsp-url"],
+    )
+
+    edc_client_timeout_seconds: int = Field(
+        20,
+        title="EDC client Timeout Seconds",
+        description="Timeout of the EDC client HTTP client.",
+        examples=[20],
     )
 
     federated_collector_concurreny_max: int = Field(
