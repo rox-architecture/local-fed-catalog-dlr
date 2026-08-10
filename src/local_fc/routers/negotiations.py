@@ -32,7 +32,7 @@ async def initiate_negotiation(
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Dataset not found")
 
     policies = dataset["odrl:hasPolicy"]
-    if not isinstance(datasets, list):
+    if not isinstance(policies, list):
         policies = [policies]
 
     return await state.edc_client.initiate_negotiation(originator, policies[0])
