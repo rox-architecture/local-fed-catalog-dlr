@@ -122,7 +122,7 @@ class EdcClient:
         url += "/v3/edrs"
         payload = {
             "@context": EDC_CONTEXT,
-            "counter_party_address": counter_party_address,
+            "counterPartyAddress": counter_party_address,
             "protocol": "dataspace-protocol-http",
             "policy": policy,
         }
