@@ -35,4 +35,8 @@ async def initiate_negotiation(
     if not isinstance(policies, list):
         policies = [policies]
 
-    return await state.edc_client.initiate_negotiation(originator, policies[0])
+    policy = policies[0]
+    policy["odrl:assigner"] = {"@id": payload.bpn}
+    policy["odrl:target"] = {"@id": payload.asset_id}
+
+    return await state.edc_client.initiate_negotiation(originator, policy)
