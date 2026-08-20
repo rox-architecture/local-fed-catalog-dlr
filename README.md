@@ -33,3 +33,7 @@ docker run --rm \
   -v "$(pwd)/partners.json:/app/config/partner-mapping.json:ro" \
   local-federated-catalog:0.1.0
 ```
+
+## Pre-built images registry
+
+https://github.com/rox-architecture/local-fed-catalog-dlr/pkgs/container/local-federated-catalog-dlr
