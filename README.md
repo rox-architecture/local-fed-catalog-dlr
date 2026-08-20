@@ -33,3 +33,18 @@ docker run --rm \
   -v "$(pwd)/partners.json:/app/config/partner-mapping.json:ro" \
   local-federated-catalog:0.1.0
 ```
+
+Fill-in `"API URL"` and `"API KEY"` with your own values. 
+
+Also, you must provide the `partners.json` file in the repository, which looks like:
+```json
+{
+  "BPNLM67H9AVUVPTD": "did:web:vision-x-api.base-x-ecosystem.org:connectors:dlr-rox-conn",
+}
+```
+This is a list of partners, BPN as the key and the location as the value.
+
+## Funding
+
+This open-source project was developed within the *[ROX](https://www.project-rox.ai/en/)* project. 
+This project has received public funding from the **European Union** NextGenerationEU within the Important Project of Common European Interest – Cloud Infrastructures and Services (IPCEI-CIS) under grant agreement 13IPC034.
