@@ -3,6 +3,9 @@ __pycache__/
 *.py[codz]
 *$py.class
 
+partners.json
+run.sh
+
 # C extensions
 *.so
 
