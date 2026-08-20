@@ -44,6 +44,11 @@ Also, you must provide the `partners.json` file in the repository, which looks l
 ```
 This is a list of partners, BPN as the key and the location as the value.
 
+## Pre-built images registry
+
+https://github.com/rox-architecture/local-fed-catalog-dlr/pkgs/container/local-federated-catalog-dlr
+
+
 ## Funding
 
 This open-source project was developed within the *[ROX](https://www.project-rox.ai/en/)* project. 
@@ -52,3 +57,4 @@ This project has received public funding from the **European Union** NextGenerat
 <p align="center">
   <img alt="Bundesministerium für Wirtschaft und Energie (BMWE)-EU and secunet funding logo" src="https://github.com/rox-architecture/kit-execution-service/blob/main/bmwe_logo.png" width="400"/>
 </p>
+
